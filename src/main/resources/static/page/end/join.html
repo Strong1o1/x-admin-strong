@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta HTTP-EQUIV="pragma" CONTENT="no-cache">
+    <meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+    <meta HTTP-EQUIV="expires" CONTENT="0">
+    <title>活动大咖</title>
+    <link rel="stylesheet" href="../../css/element.css">
+    <link rel="stylesheet" href="../../css/base.css">
+</head>
+<body>
+<div id="wrapper" v-cloak>
+    <div style="padding-bottom: 10px">
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+            <el-breadcrumb-item @click.native="parent.changeIndex('index')">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>活动大咖</el-breadcrumb-item>
+        </el-breadcrumb>
+    </div>
+
+    <div style="height: 1px; margin: 10px 0; background-color: white"></div>
+    <el-input v-model="search" style="width: 20%;" suffix-icon="el-icon-search" placeholder="请输入活动名称搜索"
+              @keyup.enter.native="loadTable"></el-input>
+    <el-button @click="loadTable" type="primary" style="margin: 10px 0">查询</el-button>
+    <el-table :data="tableData" border stripe style="width: 100%">
+        <el-table-column prop="actName" label="活动名称"></el-table-column>
+        <el-table-column prop="stopTime" label="截止报名时间"></el-table-column>
+        <el-table-column prop="needNum" label="名额"></el-table-column>
+
+        <el-table-column
+                fixed="right"
+                label="操作"
+                width="200">
+            <template slot-scope="scope">
+                <el-button type="info" round @click="edit(scope.row)">详情</el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+    <!-- 分页 -->
+    <div style="background-color: white">
+        <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="pageNum"
+                :page-sizes="[5, 10, 20, 40]"
+                :page-size="pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="total">
+        </el-pagination>
+    </div>
+
+    <el-dialog title="活动信息" :visible.sync="dialogFormVisible" width="40%"
+               :close-on-click-modal="false">
+        <el-form :model="entity">
+            <el-form-item label="名称" label-width="120px">
+                <el-input v-model="entity.actName" autocomplete="off" style="width: 80%" type="text" readonly></el-input>
+            </el-form-item>
+            <el-form-item label="描述" label-width="120px">
+                <el-input v-model="entity.description" autocomplete="off" style="width: 80%" type="text" readonly></el-input>
+            </el-form-item>
+            <el-form-item label="截止报名时间" label-width="120px">
+                <el-date-picker style="width: 80%" v-model="entity.stopTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" type="text" readonly></el-date-picker>
+            </el-form-item>
+            <el-form-item label="活动开始时间" label-width="120px">
+                <el-date-picker style="width: 80%" v-model="entity.startTime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期时间" type="text" readonly></el-date-picker>
+            </el-form-item>
+            <el-form-item label="地点" label-width="120px">
+                <el-input v-model="entity.place" autocomplete="off" style="width: 80%" type="text" readonly></el-input>
+            </el-form-item>
+            <el-form-item label="名额" label-width="120px">
+                <el-input v-model="entity.needNum" autocomplete="off" style="width: 80%" type="text" readonly></el-input>
+            </el-form-item>
+            <el-form-item label="实践分" label-width="120px">
+                <el-input v-model="entity.grade" autocomplete="off" style="width: 80%" type="text" readonly></el-input>
+            </el-form-item>
+
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <!--            <template slot-scope="scope">-->
+            <!--                <el-button type="success" plain @click="save()">立即报名</el-button>-->
+            <!--            </template>-->
+            <el-button type="success" plain @click="joinAct()" :style="{display: isShow}">立即报名</el-button>
+        </div>
+    </el-dialog>
+</div>
+
+<script src="../../js/jquery.min.js"></script>
+<script src="../../js/vue.min.js"></script>
+<script src="../../js/element.js"></script>
+<script src="../../js/tinymce/tinymce.min.js"></script>
+
+
+<script>
+
+    let urlBase = "/api/activity/";
+    new Vue({
+        el: "#wrapper",
+        data: {
+            isShow: '',
+            options: [],
+            fileList: [],
+            user: {},
+            tableData: [],
+            pageNum: 1,
+            pageSize: 5,
+            total: 0,
+            dialogFormVisible: false,
+            entity: {},
+            isCollapse: false,
+            search: '',
+        },
+        created() {
+            this.user = sessionStorage.getItem("user") ? JSON.parse(sessionStorage.getItem("user")) : {};
+            this.loadTable();
+        },
+        methods: {
+            joinAct() {
+                if (this.user.username != "admin") {
+                    $.ajax({
+                        url: "/api/student/joinAct/",
+                        type: "post",
+                        // contentType: "application/json",
+                        data: {username:this.user.username,
+                               grade:this.entity.grade,
+                               actId:this.entity.actId,
+                               needNum:this.entity.needNum}
+                    }).then(res => {
+                        if (res.code === '0') {
+                            this.$message({
+                                message: "报名成功",
+                                type: "success"
+                            });
+                            this.dialogFormVisible = false;
+                            this.loadTable();
+                        } else {
+                            this.$message({
+                                message: res.msg,
+                                type: "error"
+                            })
+                            this.dialogFormVisible = false;
+                            this.loadTable();
+                        }
+                    })
+                }
+            },
+            fileSuccessUpload(res) {
+                this.entity.file = "http://localhost:9999/files/" + res.data;
+                this.entity.img = "http://localhost:9999/files/" + res.data;
+                console.log(res)
+            },
+            successUpload(value) {
+                $.get("/api/activity/upload/" + value.data).then(res => {
+                    if (res.code === '0') {
+                        this.$message({
+                            message: "导入成功",
+                            type: "success"
+                        });
+                        this.loadTable()
+                    }
+                })
+            },
+            changeState(obj, state) {  // 审核
+                this.entity = JSON.parse(JSON.stringify(obj));
+                this.entity.state = state;
+                this.save();
+            },
+            handleCollapse() {
+                this.isCollapse = !this.isCollapse;
+            },
+            logout() {
+                $.get("/api/user/logout");
+                sessionStorage.removeItem("user");
+                location.href = "/page/end/login.html";
+            },
+            loadTable() {
+                $.get(urlBase + "/page?pageNum=" + this.pageNum + "&pageSize=" + this.pageSize + "&name=" + this.search).then(res => {
+                    this.tableData = res.data.records;
+                    this.total = res.data.total;
+                })
+
+                // $.get("/api/").then(res => {
+                // this.options = res.data;
+                // })
+            },
+            exp() {   // excel 导出
+                window.open(urlBase + "/export");
+            },
+            handleSizeChange(pageSize) {
+                this.pageSize = pageSize;
+                this.loadTable();
+            },
+            handleCurrentChange(pageNum) {
+                this.pageNum = pageNum;
+                this.loadTable();
+            },
+            add() {
+                this.entity = {};
+                this.fileList = [];
+                this.dialogFormVisible = true;
+            },
+            save() {
+                let type = this.entity.actId ? "PUT" : "POST";
+                $.ajax({
+                    url: urlBase,
+                    type: type,
+                    contentType: "application/json",
+                    data: JSON.stringify(this.entity)
+                }).then(res => {
+                    if (res.code === '0') {
+                        this.$message({
+                            message: "保存成功",
+                            type: "success"
+                        });
+                    } else {
+                        this.$message({
+                            message: res.msg,
+                            type: "error"
+                        })
+                    }
+                    this.loadTable();
+                    this.dialogFormVisible = false;
+                })
+            },
+            edit(obj) {
+                this.entity = JSON.parse(JSON.stringify(obj));
+                this.fileList = [];
+                this.dialogFormVisible = true;
+                if (this.user.username == "admin"){
+                    this.isShow = 'none';
+                }
+            },
+            del(actId) {
+                $.ajax({
+                    url: urlBase + actId,
+                    type: "delete"
+                }).then(res => {
+                    if (res.code === '0') {
+                        this.$message({
+                            message: "删除成功",
+                            type: "success"
+                        })
+                        this.loadTable();
+                    } else {
+                        this.$message({
+                            message: res.msg,
+                            type: "error"
+                        })
+                    }
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

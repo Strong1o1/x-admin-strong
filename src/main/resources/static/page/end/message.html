@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta HTTP-EQUIV="pragma" CONTENT="no-cache">
+    <meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+    <meta HTTP-EQUIV="expires" CONTENT="0">
+    <title>留言管理</title>
+    <link rel="stylesheet" href="../../css/element.css">
+    <link rel="stylesheet" href="../../css/base.css">
+</head>
+<body>
+<div id="wrapper" v-cloak>
+    <el-card style="margin-top: 20px; margin-bottom: 50px">
+        <div style="display: flex">
+            <div style="color: #888; font-size: 20px; flex: 1">在线留言</div>
+        </div>
+        <!--分割线-->
+        <div style="height: 1px; margin: 10px 0; background-color: #ccc"></div>
+
+        <div style="padding: 20px; color: #888">
+            <div>
+                <el-input type="textarea" :rows="3" v-model="entity.content"></el-input>
+                <div style="text-align: right; padding: 10px">
+                    <el-button type="primary" @click="save">留言</el-button>
+                </div>
+            </div>
+        </div>
+
+        <!--分割线-->
+        <div style="height: 1px; margin: 10px 0; background-color: #ccc"></div>
+        <div style="color: #888; font-size: 15px; flex: 1;margin-left: 1050px">联系电话：18222001767</div>
+
+        <!--父评论-->
+        <div v-for="item in messages">
+            <div style="display: flex; padding: 20px">
+                <div style="text-align: center; flex: 1">
+                    <el-image :src="['/files/' + item.avatar]"
+                              style="width: 60px; height: 60px; border-radius: 50%"></el-image>
+                </div>
+                <div style="padding: 0 10px; flex: 5;margin-left: -60px">
+                    <div style="margin-top: 25px"><b style="font-size: 14px; color: #888">{{ item.username }}</b></div>
+                    <div style="padding: 10px 0; color: #888">
+                        <span style="font-size: large;color: black">{{ item.content }}</span>
+                        <el-button type="text" @click="del(item.id)" v-if="item.username === user.username">删除
+                        </el-button>
+                    </div>
+                    <div style="background-color: #eee; padding: 10px" v-if="item.toCommentUserName != null">
+                        {{ item.username }}：{{ item.toCommentUserName }}
+                    </div>
+                    <div style="color: #888; font-size: 12px;margin-top: -10px">
+                        {{ item.createTime }}
+                        <el-button type="text" style="margin-left: 20px" @click="reReply(item.id,item.userId,item.rootId)">回复</el-button>
+                    </div>
+                </div>
+            </div>
+
+            <!--子评论-->
+            <div style="padding: 20px;margin-top: -30px" v-for="ite in item.children">
+                <div style="margin-right: 800px; text-align: center; flex: 1">
+                    <el-image :src="['/files/' + ite.avatar]"
+                              style="width: 30px; height: 30px; border-radius: 50%"></el-image>
+                </div>
+                <div style="padding: 0 10px; flex: 5;margin-left: 215px;margin-top: -40px">
+                    <div style="margin-top: 7px">
+                        <div style="font-size: 14px; color: #888">
+                            <b>{{ ite.username }}</b>&emsp;回复&nbsp;<span
+                                style="color: #0000FF">@{{ ite.toCommentUserName }}：</span>
+                            <span style="font-size: large;color: black">{{ ite.content }}</span>
+                        </div>
+                    </div>
+                    <div style="padding: 10px 0; color: #888">
+                        <el-button type="text" @click="del(ite.id)" v-if="ite.username === user.username">
+                            删除
+                        </el-button>
+                    </div>
+                    <div style="color: #888; font-size: 12px;margin-top: -20px">
+                        {{ ite.createTime }}
+                        <el-button type="text" style="margin-left: 20px" @click="reReply(ite.id,ite.userId,ite.rootId)">回复</el-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 分页 -->
+        <div class="block" style="background-color: white;margin-left: 100px">
+            <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="pageNum"
+                    :page-sizes="[2, 5, 10, 20, 40]"
+                    :page-size="pageSize"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="total">
+            </el-pagination>
+        </div>
+
+
+    </el-card>
+
+    <el-dialog title="回复信息" :visible.sync="dialogFormVisible" width="40%" :close-on-click-modal="false">
+        <el-form :model="entity">
+            <el-form-item label="内容" label-width="100px">
+                <el-input v-model="entity.reply" autocomplete="off" type="textarea" :rows="3"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="cancel">取 消</el-button>
+            <el-button type="primary" @click="reply">确 定</el-button>
+        </div>
+    </el-dialog>
+
+</div>
+
+<script src="../../js/jquery.min.js"></script>
+<script src="../../js/vue.min.js"></script>
+<script src="../../js/element.js"></script>
+<script src="../../js/tinymce/tinymce.min.js"></script>
+
+
+<script>
+
+    new Vue({
+        el: "#wrapper",
+        data: {
+            total: 0,
+            pageNum: 1,
+            pageSize: 2,
+            user: {},
+            messages: [],
+            dialogFormVisible: false,
+            isCollapse: false,
+            entity: {}
+        },
+        created() {
+            this.user = sessionStorage.getItem("user") ? JSON.parse(sessionStorage.getItem("user")) : {};
+            this.loadMessage();
+        },
+        methods: {
+            handleSizeChange(pageSize) {
+                this.pageSize = pageSize;
+                this.loadMessage();
+            },
+            handleCurrentChange(pageNum) {
+                this.pageNum = pageNum;
+                this.loadMessage();
+            },
+            handleCollapse() {
+                this.isCollapse = !this.isCollapse;
+            },
+            logout() {
+                $.get("/api/user/logout");
+                sessionStorage.removeItem("user");
+                location.href = "/page/end/login.html";
+            },
+
+            loadMessage() {
+                $.get("/api/message/commentList?pageNum=" + this.pageNum + "&pageSize=" + this.pageSize).then(res => {
+                    this.messages = res.data.rows;
+                    this.total = res.data.total;
+                })
+            },
+            cancel() {
+                this.dialogFormVisible = false;
+                this.entity = {};
+            },
+            reReply(id,userId,rootId) {
+                this.dialogFormVisible = true;
+                this.entity.toCommentId = id;
+                this.entity.toCommentUserId = userId;
+                if (rootId == -1){
+                    this.entity.rootId = id;
+                }else{
+                    this.entity.rootId = rootId;
+                }
+            },
+            reply() {
+                this.entity.content = this.entity.reply;
+                this.save();
+            },
+
+            save() {
+                if (!this.user.username) {
+                    this.$message({
+                        message: "请登录",
+                        type: "warning"
+                    });
+                    return;
+                }
+                if (!this.entity.content) {
+                    this.$message({
+                        message: "请填写内容",
+                        type: "warning"
+                    });
+                    return;
+                }
+                $.ajax({
+                    url: "/api/message",
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: JSON.stringify(this.entity)
+                }).then(res => {
+                    if (res.code === '0') {
+                        this.$message({
+                            message: "评论成功",
+                            type: "success"
+                        });
+                    } else {
+                        this.$message({
+                            message: res.msg,
+                            type: "error"
+                        });
+                    }
+                    this.entity = {}
+                    this.loadMessage();
+                    this.dialogFormVisible = false;
+                })
+            },
+            del(id) {
+                $.ajax({
+                    url: "/api/message/" + id,
+                    type: 'DELETE',
+                    contentType: "application/json"
+                }).then(res => {
+                    this.loadMessage()
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

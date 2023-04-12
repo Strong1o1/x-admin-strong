@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta HTTP-EQUIV="pragma" CONTENT="no-cache">
+    <meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+    <meta HTTP-EQUIV="expires" CONTENT="0">
+    <title>校友圈</title>
+    <link rel="stylesheet" href="../../css/element.css">
+    <link rel="stylesheet" href="../../css/audio.css">
+    <link rel="stylesheet" href="../../css/base.css">
+</head>
+<body>
+
+<div id="wrapper" v-cloak>
+    <div v-cloak v-if="isSubmit">
+        <el-container>
+
+            <el-container>
+                <!-- 主体区域 -->
+                <el-main>
+
+                    <div class="upload-box">
+                        上传<input style="cursor: pointer" type="file" @change="upload" id="file">
+                    </div>
+                    <div style="margin: 10px 0">
+                        <img :src=`/files/${uploadFile}` style="width: 100px" alt="">
+                    </div>
+
+                    <el-card style="margin-top: 20px">
+                        <textarea id="mytextarea" cols="30" rows="20" v-model="entity.content"></textarea>
+                    </el-card>
+
+                    <el-button @click="print" type="primary" plain>发布</el-button>
+
+                </el-main>
+            </el-container>
+
+        </el-container>
+    </div>
+
+
+    <div v-if="isForm">
+        <el-button @click="showSelf" type="primary" plain style="margin-left: 900px">发布动态</el-button>
+
+        <div style="display: flex; padding: 20px" v-for="item in tableData">
+            <div style="text-align: center; flex: 1">
+                <el-image :src="['/files/' + item.avatar]"
+                          style="width: 60px; height: 60px; border-radius: 50%"></el-image>
+            </div>
+            <div style="padding: 0 10px; flex: 5;margin-left: -60px;margin-top: -20px">
+                <div style="margin-top: 25px"><b style="font-size: 14px; color: #888">{{ item.nickName }}</b></div>
+                <div style="padding: 10px 0; color: #888">
+                    <el-button type="text" @click="del(item.id)" v-if="item.username === user.username">删除
+                    </el-button>
+                </div>
+                <div style="color: #888; font-size: 12px;margin-top: -10px">
+                    {{ item.createTime }}
+                    <div style="font-size: large;color: black;margin-top: 15px">{{ item.content }}</div>
+                    <!--                    <el-image :src="['/files/' + item.picture]" v-if="item.picture!=null&&item.picture!=''"-->
+                    <!--                              style="width: 160px; height: 160px;margin-top: 15px"></el-image>-->
+                    <div class="demo-image__preview">
+                        <el-image
+                                v-if="item.picture!=null&&item.picture!=''"
+                                style="width: 200px; height: 200px;margin-top: 15px"
+                                :src="['/files/' + item.picture]"
+                                :preview-src-list="['/files/' + item.picture]">
+                        </el-image>
+                    </div>
+                    <div style="margin-left: -20px">
+                        <el-button v-if="isTakeLike" v-show="item.communicateId == coId" type="text"
+                                   style="margin-left: 20px;color: red"
+                                   @click="takeLike(item.communicateId)">
+                            <img src="../../images/takeLike.jpg" style="width: 20px;height: 20px">
+                            {{item.giveLikeNum}}
+                        </el-button>
+                        <el-button v-if="isGiveLike || item.communicateId != coId" type="text"
+                                   style="margin-left: 20px"
+                                   @click="giveLike(item.communicateId)">
+                            <img src="../../images/giveLike.jpg" style="width: 20px;height: 20px">
+                            {{item.giveLikeNum}}
+                        </el-button>
+                        <el-button type="text" style="margin-left: 20px"
+                                   @click="loadComment(item.commentId,item.communicateId)">
+                            评论
+                        </el-button>
+                    </div>
+
+                    <div v-if="item.communicateId == communicateId" style="padding: 20px; color: #888">
+                        <input type="text" v-model="comment.content"
+                               style="width: 850px;height: 40px;margin-left: 20px"
+                               placeholder="&emsp;请输入评论内容">
+                        <el-button type="primary" @click="save">发布</el-button>
+                    </div>
+
+                    <!--父评论-->
+                    <div v-for="ite in comments" v-if="item.communicateId == communicateId" style="margin-left: -40px">
+                        <div style="display: flex; padding: 20px">
+                            <div style="text-align: center; flex: 1">
+                                <el-image :src="['/files/' + ite.avatar]"
+                                          style="width: 30px; height: 30px; border-radius: 50%"></el-image>
+                            </div>
+                            <div style="padding: 0 10px; flex: 5;margin-left: -70px;margin-top: -20px">
+                                <div style="margin-top: 25px"><b
+                                        style="font-size: 14px; color: #888">{{ ite.username}}</b></div>
+                                <div style="padding: 10px 0; color: #888">
+                                    <span style="font-size: large;color: black">{{ ite.content }}</span>
+                                    <el-button type="text" @click="del(ite.id)" v-if="ite.username === user.username">删除
+                                    </el-button>
+                                </div>
+                                <!--                                <div style="background-color: #eee; padding: 10px" v-if="item.toCommentUserName != null">-->
+                                <!--                                    {{ item.username }}：{{ item.toCommentUserName }}-->
+                                <!--                                </div>-->
+                                <div style="color: #888; font-size: 12px;margin-top: -10px">
+                                    {{ ite.createTime }}
+                                    <el-button type="text" style="margin-left: 20px"
+                                               @click="reReply(ite.commentId,ite.userId,ite.rootId)">
+                                        回复
+                                    </el-button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--子评论-->
+                        <div style="padding: 20px;margin-top: -30px" v-for="it in ite.children">
+                            <div style="margin-right: 700px; text-align: center; flex: 1">
+                                <el-image :src="['/files/' + it.avatar]"
+                                          style="width: 30px; height: 30px; border-radius: 50%"></el-image>
+                            </div>
+                            <div style="padding: 0 10px; flex: 5;margin-left: 200px;margin-top: -40px">
+                                <div style="margin-top: 7px">
+                                    <div style="font-size: 14px; color: #888">
+                                        <b>{{ it.username }}</b>&emsp;回复&nbsp;<span
+                                            style="color: #0000FF">@{{ it.toCommentUserName }}：</span>
+                                        <span style="font-size: large;color: black">{{ it.content }}</span>
+                                    </div>
+                                </div>
+                                <div style="padding: 10px 0; color: #888">
+                                    <el-button type="text" @click="del(it.id)" v-if="it.username === user.username">
+                                        删除
+                                    </el-button>
+                                </div>
+                                <div style="color: #888; font-size: 12px;margin-top: -20px">
+                                    {{ it.createTime }}
+                                    <el-button type="text" style="margin-left: 20px"
+                                               @click="reReply(it.commentId,ite.userId,it.rootId)">回复
+                                    </el-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr style="margin-top: 30px">
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 分页 -->
+        <div v-if="false"
+             style="background-color: rgb(244,244,244);margin-top: 115px;margin-left: 100px;margin-top: 18px;">
+            <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="pageNum"
+                    :page-sizes="[2, 5, 10, 20, 40]"
+                    :page-size="pageSize"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="total">
+            </el-pagination>
+        </div>
+    </div>
+
+    <el-dialog title="回复信息" :visible.sync="dialogFormVisible" width="40%" :close-on-click-modal="false">
+        <el-form :model="comment">
+            <el-form-item label="内容" label-width="100px">
+                <el-input v-model="comment.reply" autocomplete="off" type="textarea" :rows="3"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="cancel">取 消</el-button>
+            <el-button type="primary" @click="reply">确 定</el-button>
+        </div>
+    </el-dialog>
+
+</div>
+
+<script src="../../js/jquery.min.js"></script>
+<script src="../../js/vue.min.js"></script>
+<script src="../../js/element.js"></script>
+<script src="../../js/tinymce/tinymce.min.js"></script>
+<script src="../../js/audio.js"></script>
+<script src="../../js/base.js"></script>
+
+<script>
+
+    let urlBase = "/api/communicate/";
+    new Vue({
+        el: "#wrapper",
+        data: {
+            commentId: 0,
+            communicateId: 0,
+            comment: {},
+            comments: [],
+            coId: 0,
+            isTakeLike: false,
+            isGiveLike: true,
+            isSubmit: false,
+            isForm: true,
+            options: [],
+            fileList: [],
+            user: {},
+            tableData: [],
+            pageNum: 1,
+            pageSize: 100,
+            total: 0,
+            dialogFormVisible: false,
+            entity: {},
+            isCollapse: false,
+            search: '',
+            uploadFile: ''
+        },
+        created() {
+            this.user = sessionStorage.getItem("user") ? JSON.parse(sessionStorage.getItem("user")) : {};
+            this.loadTable();
+        },
+        methods: {
+            cancel() {
+                this.dialogFormVisible = false;
+                this.entity = {};
+            },
+            loadComment(commentId, communicateId) {
+                this.commentId = commentId;
+                this.communicateId = communicateId;
+                $.get("/api/communicate/commentList?pageNum=" + this.pageNum + "&pageSize=" + this.pageSize + "&communicateId=" + communicateId).then(res => {
+                    this.comments = res.data.rows;
+                    this.total = res.data.total;
+                })
+            },
+            print() {
+                $.ajax({
+                    url: "/api/communicate/show",
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: JSON.stringify(this.entity)
+                }).then(res => {
+                    if (this.entity.content != undefined) {
+                        if (res.code === '0') {
+                            this.$message({
+                                message: "发布成功",
+                                type: "success"
+                            });
+                        } else {
+                            this.$message({
+                                message: res.msg,
+                                type: "error"
+                            });
+                        }
+                        this.entity = {}
+                        this.dialogFormVisible = false;
+                        this.isSubmit = false;
+                        this.isForm = true;
+                        this.loadTable();
+                    } else {
+                        this.$message({
+                            message: "请输入内容",
+                            type: "error"
+                        });
+                    }
+                })
+            },
+            giveLike(communicateId) {
+                $.get(urlBase + "givelike/" + communicateId).then(res => {
+                    this.coId = communicateId;
+                    this.isTakeLike = true;
+                    this.isGiveLike = false;
+                    this.loadTable();
+                })
+            },
+            takeLike(communicateId) {
+                $.get(urlBase + "takelike/" + communicateId).then(res => {
+                    this.isTakeLike = false;
+                    this.isGiveLike = true;
+                    this.loadTable();
+                })
+            },
+            showSelf() {
+                this.isSubmit = true;
+                this.isForm = false;
+                this.loadTable();
+            },
+            // print() {
+            //     console.log(tinymce.activeEditor.getContent())
+            // },
+            upload() {
+                let formData = new FormData();
+                formData.append("file", $("#file")[0].files[0])
+                this.entity.picture = $("#file")[0].files[0].name;
+                $.ajax({
+                    url: '/files/upload',
+                    processData: false,
+                    contentType: false,
+                    type: 'POST',
+                    data: formData
+                }).then(res => {
+                    if (res.code === '0') {
+                        this.$message({
+                            type: "success",
+                            message: "上传成功"
+                        });
+                        this.uploadFile = res.data
+                        // 清除已上传的文件
+                        let file = $("#file");
+                        file.val("")
+                    }
+                })
+
+            },
+            reReply(commentId, userId, rootId) {
+                this.dialogFormVisible = true;
+                this.comment.communicateId = this.communicateId;
+                this.comment.toCommentId = commentId;
+                this.comment.toCommentUserId = userId;
+                if (rootId == -1) {
+                    this.comment.rootId = commentId;
+                } else {
+                    this.comment.rootId = rootId;
+                }
+            },
+            reply() {
+                this.comment.content = this.comment.reply;
+                this.save();
+            },
+            save() {
+                this.comment.communicateId = this.communicateId;
+                console.log(this.comment);
+                if (!this.user.username) {
+                    this.$message({
+                        message: "请登录",
+                        type: "warning"
+                    });
+                    return;
+                }
+                if (!this.comment.content) {
+                    console.log(this.comment.content);
+                    this.$message({
+                        message: "请填写内容",
+                        type: "warning"
+                    });
+                    return;
+                }
+                $.ajax({
+                    url: "/api/communicate",
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: JSON.stringify(this.comment)
+                }).then(res => {
+                    if (res.code === '0') {
+                        this.$message({
+                            message: "评论成功",
+                            type: "success"
+                        });
+                    } else {
+                        this.$message({
+                            message: res.msg,
+                            type: "error"
+                        });
+                    }
+                    this.comment = {}
+                    this.loadComment(this.commentId,this.communicateId);
+                    this.dialogFormVisible = false;
+                })
+            },
+            fileSuccessUpload(res) {
+                // this.entity.file = "http://localhost:9999/files/" + res.data;
+                // this.entity.img = "http://localhost:9999/files/" + res.data;
+                // console.log(res)
+            },
+            successUpload(value) {
+                $.get("/api/communicate/upload/" + value.data).then(res => {
+                    if (res.code === '0') {
+                        this.$message({
+                            message: "导入成功",
+                            type: "success"
+                        });
+                        this.loadTable()
+                    }
+                })
+            },
+            changeState(obj, state) {  // 审核
+                this.entity = JSON.parse(JSON.stringify(obj));
+                this.entity.state = state;
+                this.save();
+            },
+            handleCollapse() {
+                this.isCollapse = !this.isCollapse;
+            },
+            logout() {
+                $.get("/api/user/logout");
+                sessionStorage.removeItem("user");
+                location.href = "/page/end/login.html";
+            },
+            loadTable() {
+                $.get(urlBase + "page?pageNum=" + this.pageNum + "&pageSize=" + this.pageSize).then(res => {
+                    this.tableData = res.data.rows;
+                    this.total = res.data.total;
+                })
+
+                // $.get("/api/").then(res => {
+                // this.options = res.data;
+                // })
+            },
+            exp() {   // excel 导出
+                window.open(urlBase + "/export");
+            },
+            handleSizeChange(pageSize) {
+                this.pageSize = pageSize;
+                this.loadTable();
+            },
+            handleCurrentChange(pageNum) {
+                this.pageNum = pageNum;
+                this.loadTable();
+            },
+            add() {
+                this.entity = {};
+                this.fileList = [];
+                this.dialogFormVisible = true;
+            },
+            edit(obj) {
+                this.entity = JSON.parse(JSON.stringify(obj));
+                this.fileList = [];
+                this.dialogFormVisible = true;
+            },
+            del(communicateId) {
+                $.ajax({
+                    url: urlBase + communicateId,
+                    type: "delete"
+                }).then(res => {
+                    if (res.code === '0') {
+                        this.$message({
+                            message: "删除成功",
+                            type: "success"
+                        })
+                        this.loadTable();
+                    } else {
+                        this.$message({
+                            message: res.msg,
+                            type: "error"
+                        })
+                    }
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

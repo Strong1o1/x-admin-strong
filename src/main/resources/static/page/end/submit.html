@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>插件管理</title>
+  <link rel="stylesheet" href="../../css/element.css">
+  <link rel="stylesheet" href="../../css/audio.css">
+  <link rel="stylesheet" href="../../css/base.css">
+</head>
+<body>
+<div id="wrapper" v-cloak>
+  <el-container>
+
+    <el-container>
+      <!-- 主体区域 -->
+      <el-main>
+
+        <div class="upload-box">
+          上传<input style="cursor: pointer" type="file" @change="upload" id="file">
+        </div>
+        <div style="margin: 10px 0">
+          <img :src=`/files/${uploadFile}` style="width: 100px" alt="">
+        </div>
+
+        <el-card style="margin-top: 20px">
+          <textarea id="mytextarea" cols="30" rows="20"></textarea>
+        </el-card>
+
+        <el-button @click="print">打印富文本</el-button>
+
+      </el-main>
+    </el-container>
+
+  </el-container>
+</div>
+
+<script src="../../js/jquery.min.js"></script>
+<script src="../../js/vue.min.js"></script>
+<script src="../../js/element.js"></script>
+<script src="../../js/tinymce/tinymce.min.js"></script>
+<script src="../../js/audio.js"></script>
+<script src="../../js/base.js"></script>
+
+<script>
+
+  let urlBase = "/user/"
+  new Vue({
+    el: "#wrapper",
+    data: {
+      user: {},
+      isCollapse: false,
+      uploadFile: ''
+    },
+    created() {
+      this.user = sessionStorage.getItem("user") ? JSON.parse(sessionStorage.getItem("user")) : {};
+
+      tinymce.init({
+        selector: '#mytextarea',
+        language: 'zh_CN',
+        plugins: ['quickbars', 'link', 'table', 'image'], //选择需加载的插件
+      });
+    },
+    methods: {
+      print() {
+        console.log(tinymce.activeEditor.getContent())
+      },
+      upload() {
+        let formData = new FormData();
+        formData.append("file", $("#file")[0].files[0])
+        $.ajax({
+          url: '/files/upload',
+          processData: false,
+          contentType: false,
+          type: 'POST',
+          data: formData
+        }).then(res => {
+          if (res.code === '0') {
+            this.$message({
+              type: "success",
+              message: "上传成功"
+            });
+            this.uploadFile = res.data
+            // 清除已上传的文件
+            let file = $("#file");
+            file.val("")
+          }
+        })
+      },
+      handleCollapse() {
+        this.isCollapse = !this.isCollapse;
+      },
+      logout() {
+        $.get("/user/logout");
+        sessionStorage.removeItem("user");
+        location.href = "/page/end/login.html";
+      }
+    }
+  })
+</script>
+</body>
+</html>

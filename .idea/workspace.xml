@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ce5b7694-7714-401e-8c22-d920067b5e64" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CompilerWorkspaceConfiguration">
+    <option name="MAKE_PROJECT_ON_SAVE" value="true" />
+    <option name="PARALLEL_COMPILATION" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="E:/Java/JavaTools/IDEA/Maven/apache-maven-3.6.1" />
+        <option name="useMavenConfig" value="true" />
+        <option name="userSettingsFile" value="E:\Java\JavaTools\IDEA\Maven\apache-maven-3.6.1\conf\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="workspaceImportEnabled" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="2Mgd8Z2UoLFJZc2l6ZJwlysw5BF" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Document/项目/三更博客系统/资源/后端工程/sgblog&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
+    &quot;spring.configuration.checksum&quot;: &quot;8b32e336e963681392fb0ffef072829a&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;
+    ]
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Document\毕设\x-admin-strong\src\main\resources\static\images" />
+      <recent name="D:\Document\毕设\x-admin-strong\src\main\resources\static\file\home" />
+      <recent name="D:\Document\毕设\x-admin-strong\src\main\resources\static\file" />
+      <recent name="D:\Document\毕设\x-admin-strong\src\main\java\com\example\entity" />
+      <recent name="D:\Document\毕设\x-admin-strong\src\main\resources\static\page\end" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Document\毕设\x-admin-strong\src\main\resources\static\file" />
+      <recent name="D:\Document\毕设\x-admin-strong\src\main\resources\static\js\tinymce" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.example.entity" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Spring Boot.Application">
+    <configuration name="MybatisCodeGenerator" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.example.utils.generator.MybatisCodeGenerator" />
+      <module name="x-admin" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.example.utils.generator.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Application" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="x-admin" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.Application" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.MybatisCodeGenerator" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ce5b7694-7714-401e-8c22-d920067b5e64" name="Changes" comment="" />
+      <created>1678193002098</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1678193002098</updated>
+      <workItem from="1678193003247" duration="3999000" />
+      <workItem from="1678239002453" duration="12466000" />
+      <workItem from="1678263482944" duration="15036000" />
+      <workItem from="1678318299068" duration="22550000" />
+      <workItem from="1678590053658" duration="494000" />
+      <workItem from="1678590562444" duration="213000" />
+      <workItem from="1678590826207" duration="7000" />
+      <workItem from="1678591040207" duration="69000" />
+      <workItem from="1678599234090" duration="160000" />
+      <workItem from="1678620408493" duration="916000" />
+      <workItem from="1678621476237" duration="22000" />
+      <workItem from="1678627997453" duration="70000" />
+      <workItem from="1678679671139" duration="43000" />
+      <workItem from="1678930306987" duration="101000" />
+      <workItem from="1678961653759" duration="6202000" />
+      <workItem from="1679139893363" duration="6211000" />
+      <workItem from="1679147385596" duration="8412000" />
+      <workItem from="1679187281993" duration="43644000" />
+      <workItem from="1679272714918" duration="51973000" />
+      <workItem from="1679347130760" duration="9758000" />
+      <workItem from="1679359848320" duration="11102000" />
+      <workItem from="1679755384347" duration="1074000" />
+      <workItem from="1679883505741" duration="12944000" />
+      <workItem from="1680007870069" duration="601000" />
+      <workItem from="1680095365621" duration="23000" />
+      <workItem from="1680100567643" duration="26000" />
+      <workItem from="1680392356804" duration="7775000" />
+      <workItem from="1680402760340" duration="9000" />
+      <workItem from="1680413848559" duration="18855000" />
+      <workItem from="1680486912537" duration="3483000" />
+      <workItem from="1680495390159" duration="21071000" />
+      <workItem from="1680534677233" duration="11606000" />
+      <workItem from="1680694191999" duration="1207000" />
+      <workItem from="1680696518418" duration="10663000" />
+      <workItem from="1680833247257" duration="1894000" />
+      <workItem from="1681055805604" duration="29000" />
+      <workItem from="1681096237705" duration="40000" />
+      <workItem from="1681097031701" duration="5000" />
+      <workItem from="1681102743563" duration="1234000" />
+      <workItem from="1681177400338" duration="15826000" />
+      <workItem from="1681200734574" duration="2104000" />
+      <workItem from="1681202903632" duration="965000" />
+      <workItem from="1681275674647" duration="11000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-core" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-websocket" />
+    <option featureType="dependencySupport" implementationName="java:org.hibernate.validator:hibernate-validator" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-messaging" />
+    <option featureType="dependencySupport" implementationName="java:javax.validation:validation-api" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework.boot:spring-boot" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-webmvc" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/example/controller/BookController.java</url>
+          <line>80</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

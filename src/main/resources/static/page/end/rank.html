@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta HTTP-EQUIV="pragma" CONTENT="no-cache">
+  <meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+  <meta HTTP-EQUIV="expires" CONTENT="0">
+  <title>排行榜</title>
+  <link rel="stylesheet" href="../../css/element.css">
+  <link rel="stylesheet" href="../../css/base.css">
+</head>
+<body>
+<div id="wrapper" v-cloak>
+  <div style="padding-bottom: 10px">
+    <el-breadcrumb separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item @click.native="parent.changeIndex('index')">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>排行榜</el-breadcrumb-item>
+    </el-breadcrumb>
+  </div>
+
+  <div style="height: 1px; margin: 10px 0; background-color: white"></div>
+<!--  <el-input v-model="search" style="width: 20%;" suffix-icon="el-icon-search" placeholder="请输入名称搜索"-->
+<!--            @keyup.enter.native="loadTable"></el-input>-->
+<!--  <el-button @click="loadTable" type="primary"  style="margin: 10px 0">查询</el-button>-->
+  <el-table :data="tableData" border stripe style="width: 100%">
+    <el-table-column label="排名" type="index" :index="indexMethod"></el-table-column>
+    <el-table-column prop="stuName" label="姓名"></el-table-column>
+    <el-table-column prop="stuScore" label="实践分"></el-table-column>
+  </el-table>
+  <!-- 分页 -->
+  <div style="background-color: white">
+    <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="pageNum"
+            :page-sizes="[5, 10, 20, 40]"
+            :page-size="pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
+    </el-pagination>
+  </div>
+
+</div>
+
+<script src="../../js/jquery.min.js"></script>
+<script src="../../js/vue.min.js"></script>
+<script src="../../js/element.js"></script>
+<script src="../../js/tinymce/tinymce.min.js"></script>
+
+
+<script>
+
+  let urlBase = "/api/student/";
+  new Vue({
+    el: "#wrapper",
+    data: {
+      options: [],
+      fileList: [],
+      user: {},
+      tableData: [],
+      pageNum: 1,
+      pageSize: 10,
+      total: 0,
+      dialogFormVisible: false,
+      entity: {},
+      isCollapse: false,
+      search: '',
+    },
+    created() {
+      this.user = sessionStorage.getItem("user") ? JSON.parse(sessionStorage.getItem("user")) : {};
+      this.loadTable();
+    },
+    methods: {
+      indexMethod(index){
+        index = (index + 1) + (this.pageNum - 1) * this.pageSize;
+        return index;
+      },
+      fileSuccessUpload(res) {
+        this.entity.file = "http://localhost:9999/files/" + res.data;
+        this.entity.img = "http://localhost:9999/files/" + res.data;
+        console.log(res)
+      },
+      successUpload(value) {
+        $.get("/api/student/upload/" + value.data).then(res => {
+          if (res.code === '0') {
+            this.$message({
+              message: "导入成功",
+              type: "success"
+            });
+            this.loadTable()
+          }
+        })
+      },
+      changeState(obj, state) {  // 审核
+        this.entity = JSON.parse(JSON.stringify(obj));
+        this.entity.state = state;
+        this.save();
+      },
+      handleCollapse() {
+        this.isCollapse = !this.isCollapse;
+      },
+      logout() {
+        $.get("/api/user/logout");
+        sessionStorage.removeItem("user");
+        location.href = "/page/end/login.html";
+      },
+      loadTable() {
+        $.get(urlBase + "/rank?pageNum=" + this.pageNum + "&pageSize=" + this.pageSize + "&name=" + this.search).then(res => {
+          this.tableData = res.data.records;
+          this.total = res.data.total;
+        })
+
+        // $.get("/api/").then(res => {
+        // this.options = res.data;
+        // })
+      },
+      exp() {   // excel 导出
+        window.open(urlBase + "/export");
+      },
+      handleSizeChange(pageSize) {
+        this.pageSize = pageSize;
+        this.loadTable();
+      },
+      handleCurrentChange(pageNum) {
+        this.pageNum = pageNum;
+        this.loadTable();
+      },
+      add() {
+        this.entity = {};
+        this.fileList = [];
+        this.dialogFormVisible = true;
+      },
+      save() {
+        let type = this.entity.stuId ? "PUT" : "POST";
+        $.ajax({
+          url: urlBase,
+          type: type,
+          contentType: "application/json",
+          data: JSON.stringify(this.entity)
+        }).then(res => {
+          if (res.code === '0') {
+            this.$message({
+              message: "保存成功",
+              type: "success"
+            });
+          } else {
+            this.$message({
+              message: res.msg,
+              type: "error"
+            })
+          }
+          this.loadTable();
+          this.dialogFormVisible = false;
+        })
+      },
+      edit(obj) {
+        this.entity = JSON.parse(JSON.stringify(obj));
+        this.fileList = [];
+        this.dialogFormVisible = true;
+      },
+      del(stuId) {
+        $.ajax({
+          url: urlBase + stuId,
+          type: "delete"
+        }).then(res => {
+          if (res.code === '0') {
+            this.$message({
+              message: "删除成功",
+              type: "success"
+            })
+            this.loadTable();
+          } else {
+            this.$message({
+              message: res.msg,
+              type: "error"
+            })
+          }
+        })
+      }
+    }
+  })
+</script>
+</body>
+</html>
